@@ -1,6 +1,8 @@
 #include <iostream>
 using namespace std;
 #include <cstdlib>
+#include <math.h>
+#include <unordered_map>
 
 struct Node
 {
@@ -79,7 +81,7 @@ double ApplyOperator(char op, double a, double b)
 
         case '/': return a / b;
 
-        case '%': return a;
+        case '%': return fmod(a, b);
 
         case '&': return (a != 0) && (b != 0);
 
@@ -94,10 +96,8 @@ double ApplyOperator(char op, double a, double b)
     }
 }
 
-int main()
+string InfixToPostfix(Node *top, string Infix)
 {
-    Node *top = NULL;
-    string Infix = "a+b*c/d*x-f*d";
     string Postfix = "";
 
     for (int i = 0; i < Infix.length(); i++)
@@ -139,8 +139,50 @@ int main()
             Pop(&top);
         }
     }
+    return Postfix;
+}
 
+int PostfixEvaluation(Node *top, string Postfix)
+{
+    unordered_map<char, int> varValues;
+    for (int i = 0; i < Postfix.length(); i++)
+    {
+        if ((Postfix[i] >= 'a' && Postfix[i] <= 'z') || (Postfix[i] >= 'A' && Postfix[i] <= 'Z'))
+        {
+            cout << "Enter a value for " << Postfix[i] << " : ";
+            double value;
+            cin >> value;
+            Push(&top, value);
+        }
+        else if (Postfix[i] >= '0' && Postfix[i] <= '9')
+        {
+            Push(&top, Postfix[i]-'0');
+        }
+        else
+        {
+            int op2 = top->value;
+            Pop(&top);
+            int op1 = top->value;
+            Pop(&top);
+
+            int result = ApplyOperator(Postfix[i], op1, op2);
+            Push(&top, result);
+        }
+    }
+    return top->value;
+}
+
+int main()
+{
+    Node *top = NULL; //top for conversion stack
+    Node *etop = NULL; // top for evaluation stack
+    string Infix = "a+b*c/d*x-f*d";
+
+    string Postfix = InfixToPostfix(top, Infix);
     cout << "Postfix: " << Postfix << endl;
+
+    int Evaluation = PostfixEvaluation(etop, Postfix);
+    cout << "Postfix Evaluation: " << PostfixEvaluation;
 
     return 0;
 }
