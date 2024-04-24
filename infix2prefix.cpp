@@ -1,7 +1,7 @@
 #include <iostream>
 using namespace std;
-#include <cstdlib>
 #include <math.h>
+#include <algorithm>
 
 struct Node
 {
@@ -152,65 +152,69 @@ double ApplyOperator(char op, double a, double b)
     }
 }
 
-string InfixToPostfix(Node *top, string Infix)
+string infixToPrefix(Node *top, string Infix)
 {
-    string Postfix;
+    reverse(Infix.begin(), Infix.end());
+    string Prefix = "";
 
     for (int i = 0; i < Infix.length(); i++)
     {
         if ((Infix[i] >= 'a' && Infix[i] <= 'z') || (Infix[i] >= 'A' && Infix[i] <= 'Z'))
         {
-            Postfix += Infix[i];
-        }
-        else if (Infix[i] == '(')
-        {
-            Push(&top, Infix[i]);
+            Prefix += Infix[i];
         }
         else if (Infix[i] == ')')
         {
-            while ((top != nullptr) && (top->value != '('))
+            Push(&top, Infix[i]);
+        }
+        else if (Infix[i] == '(')
+        {
+            while (top && (top->value != ')'))
             {
-                Postfix += top->value;
+                Prefix += top->value;
                 Pop(&top);
             }
-            if (top != nullptr)
+            if (top)
             {
                 Pop(&top);
             }
         }
         else
         {
-            while ((top != nullptr) && (getPrecedence(top->value) > getPrecedence(Infix[i])) && (top->value != '('))
+            while (top && (getPrecedence(top->value) >= getPrecedence(Infix[i])))
             {
-                Postfix += top->value;
+                Prefix += top->value;
                 Pop(&top);
             }
             Push(&top, Infix[i]);
         }
     }
-    while (top != nullptr)
+
+    while (top)
     {
-        Postfix += top->value;
+        Prefix += top->value;
         Pop(&top);
     }
 
-    return Postfix;
+    reverse(Prefix.begin(), Prefix.end());
+    return Prefix;
 }
 
-int PostfixEvaluation(Node *top, string Postfix)
+int PrefixEvaluation(Node *top, string Prefix)
 {
-    for (int i = 0; i < Postfix.length(); i++)
+    reverse(Prefix.begin(), Prefix.end());
+    for (int i = 0; i < Prefix.length(); i++)
     {
-        if ((Postfix[i] >= 'a' && Postfix[i] <= 'z') || (Postfix[i] >= 'A' && Postfix[i] <= 'Z'))
+        if ((Prefix[i] >= 'a' && Prefix[i] <= 'z') || (Prefix[i] >= 'A' && Prefix[i] <= 'Z'))
         {
-            cout << "Enter a value for " << Postfix[i] << " : ";
+            cout << "Enter a value for " << Prefix[i] << " : ";
             double value;
             cin >> value;
             Push(&top, value);
         }
-        else if (Postfix[i] >= '0' && Postfix[i] <= '9')
+        else if (Prefix[i] >= '0' && Prefix[i] <= '9')
         {
-            Push(&top, Postfix[i] - '0');
+            Push(&top, Prefix[i] - '0');
         }
         else
         {
@@ -219,7 +223,7 @@ int PostfixEvaluation(Node *top, string Postfix)
             int op1 = top->value;
             Pop(&top);
 
-            int result = ApplyOperator(Postfix[i], op1, op2);
+            int result = ApplyOperator(Prefix[i], op1, op2);
             Push(&top, result);
         }
     }
@@ -237,21 +241,22 @@ void Display(ExNode *root)
     Display(root->right);
 }
 
-void CreateEvaluationTree(string Postfix, STNode **stop)
+void CreateEvaluationTree(string Prefix, STNode **stop)
 {
-    for (int i = 0; i < Postfix.length(); i++)
+    reverse(Prefix.begin(), Prefix.end());
+    for (int i = 0; i < Prefix.length(); i++)
     {
-        ExNode *ptr = new ExNode(Postfix[i]);
+        ExNode *ptr = new ExNode(Prefix[i]);
 
-        if ((Postfix[i] >= 'a' && Postfix[i] <= 'z') || (Postfix[i] >= 'A' && Postfix[i] <= 'Z') || (Postfix[i] >= '0' && Postfix[i] <= '9'))
+        if ((Prefix[i] >= 'a' && Prefix[i] <= 'z') || (Prefix[i] >= 'A' && Prefix[i] <= 'Z') || (Prefix[i] >= '0' && Prefix[i] <= '9'))
         {
             STPush(stop, ptr);
         }
         else
         {
-            ptr->right = (*stop)->entry;
-            STPop(stop);
             ptr->left = (*stop)->entry;
+            STPop(stop);
+            ptr->right = (*stop)->entry;
             STPop(stop);
 
             STPush(stop, ptr);
@@ -261,18 +266,18 @@ void CreateEvaluationTree(string Postfix, STNode **stop)
 
 int main()
 {
-    Node *top = NULL;    // top for conversion stack
-    Node *etop = NULL;   // top for evaluation stack
-    STNode *stop = NULL; // top for tree stack
+    Node *top = nullptr;
+    Node *etop = nullptr;
+    STNode *stop = nullptr;
     string Infix = "(a-b/c)*(a/k-l)";
 
-    string Postfix = InfixToPostfix(top, Infix);
-    cout << "Postfix: " << Postfix << endl;
+    string Prefix = infixToPrefix(top, Infix);
+    cout << "Prefix Expression: " << Prefix << endl;
 
-    int Evaluation = PostfixEvaluation(etop, Postfix);
-    cout << "Postfix Evaluation: " << PostfixEvaluation << endl;
+    int Evaluation = PrefixEvaluation(etop, Prefix);
+    cout << "Prefix Evaluation: " << Evaluation << endl;
 
-    CreateEvaluationTree(Postfix, &stop);
+    CreateEvaluationTree(Prefix, &stop);
     Display(stop->entry);
 
     return 0;
