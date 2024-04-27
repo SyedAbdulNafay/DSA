@@ -14,6 +14,17 @@ struct Node
     }
 };
 
+struct ENode
+{
+    double value;
+    ENode *next;
+
+    ENode(double input)
+    {
+        value = input;
+    }
+};
+
 struct ExNode
 {
     char value;
@@ -80,6 +91,14 @@ void Push(Node **top, char c)
     *top = ptr;
 }
 
+void EPush(ENode **top, int c)
+{
+    ENode *ptr = new ENode(c);
+
+    ptr->next = *top;
+    *top = ptr;
+}
+
 void STPush(STNode **stop, ExNode *c)
 {
     STNode *ptr = new STNode(c);
@@ -97,6 +116,20 @@ void Pop(Node **top)
     else
     {
         Node *temp = *top;
+        *top = (*top)->next;
+        free(temp);
+    }
+}
+
+void EPop(ENode **top)
+{
+    if (*top == NULL)
+    {
+        cout << "Stack Underflow" << endl;
+    }
+    else
+    {
+        ENode *temp = *top;
         *top = (*top)->next;
         free(temp);
     }
@@ -154,42 +187,47 @@ double ApplyOperator(char op, double a, double b)
 
 string InfixToPostfix(Node *top, string Infix)
 {
-    string Postfix;
+    string Postfix = "";
 
     for (int i = 0; i < Infix.length(); i++)
     {
         if ((Infix[i] >= 'a' && Infix[i] <= 'z') || (Infix[i] >= 'A' && Infix[i] <= 'Z'))
         {
+            // cout << Infix[i] << " is added to Postfix" << endl;
             Postfix += Infix[i];
         }
         else if (Infix[i] == '(')
         {
+            // cout << "( is added to stack" << endl;
             Push(&top, Infix[i]);
         }
         else if (Infix[i] == ')')
         {
             while ((top != nullptr) && (top->value != '('))
             {
+                // cout << top->value << " is popped from the stack and added to Postfix" << endl;
                 Postfix += top->value;
                 Pop(&top);
             }
-            if (top != nullptr)
-            {
-                Pop(&top);
-            }
+            // cout << top->value << " is popped from the stack" << endl;
+            Pop(&top);
         }
         else
         {
-            while ((top != nullptr) && (getPrecedence(top->value) > getPrecedence(Infix[i])) && (top->value != '('))
+            while ((top != nullptr) && (getPrecedence(Infix[i]) <= getPrecedence(top->value)) && (top->value != '('))
             {
+                // cout << top->value << " is popped from the stack and added to Postfix" << endl;
                 Postfix += top->value;
                 Pop(&top);
             }
+            // cout << Infix[i] << " is added to the stack" << endl;
             Push(&top, Infix[i]);
         }
     }
+    // cout << "Length of the string is completed" << endl;
     while (top != nullptr)
     {
+        // cout << top->value << " is popped from the stack and added to Postfix" << endl;
         Postfix += top->value;
         Pop(&top);
     }
@@ -197,32 +235,51 @@ string InfixToPostfix(Node *top, string Infix)
     return Postfix;
 }
 
-int PostfixEvaluation(Node *top, string Postfix)
+double PostfixEvaluation(ENode *top, string Postfix)
 {
-    for (int i = 0; i < Postfix.length(); i++)
+    for (double i = 0; i < Postfix.length(); i++)
     {
         if ((Postfix[i] >= 'a' && Postfix[i] <= 'z') || (Postfix[i] >= 'A' && Postfix[i] <= 'Z'))
         {
             cout << "Enter a value for " << Postfix[i] << " : ";
             double value;
             cin >> value;
-            Push(&top, value);
+            EPush(&top, value);
+            // cout << "Stack: ";
+            // ENode *curr = top;
+            // while (curr != NULL)
+            // {
+            //     cout << curr->value << " ";
+            //     curr = curr->next;
+            // }
+            // cout << endl;
         }
         else if (Postfix[i] >= '0' && Postfix[i] <= '9')
         {
-            Push(&top, Postfix[i] - '0');
+            EPush(&top, Postfix[i] - '0');
         }
         else
         {
-            int op2 = top->value;
-            Pop(&top);
-            int op1 = top->value;
-            Pop(&top);
+            // cout << Postfix[i] << " is applied" << endl;
+            double op2 = top->value;
+            EPop(&top);
+            double op1 = top->value;
+            EPop(&top);
+            // cout << "op1: " << op1 << "  " << "op2: " << op2 << endl;
 
-            int result = ApplyOperator(Postfix[i], op1, op2);
-            Push(&top, result);
+            double result = ApplyOperator(Postfix[i], op1, op2);
+            EPush(&top, result);
+            // cout << "Stack: ";
+            // ENode *curr = top;
+            // while (curr != NULL)
+            // {
+            //     cout << curr->value << " ";
+            //     curr = curr->next;
+            // }
+            // cout << endl;
         }
     }
+    // cout << "final answer: " << top->value << endl;
     return top->value;
 }
 
@@ -262,15 +319,15 @@ void CreateEvaluationTree(string Postfix, STNode **stop)
 int main()
 {
     Node *top = NULL;    // top for conversion stack
-    Node *etop = NULL;   // top for evaluation stack
+    ENode *etop = NULL;   // top for evaluation stack
     STNode *stop = NULL; // top for tree stack
-    string Infix = "(a-b/c)*(a/k-l)";
+    string Infix = "a+b*c/d*x-f*d";
 
     string Postfix = InfixToPostfix(top, Infix);
     cout << "Postfix: " << Postfix << endl;
 
-    int Evaluation = PostfixEvaluation(etop, Postfix);
-    cout << "Postfix Evaluation: " << PostfixEvaluation << endl;
+    double Evaluation = PostfixEvaluation(etop, Postfix);
+    cout << "Postfix Evaluation: " << Evaluation << endl;
 
     CreateEvaluationTree(Postfix, &stop);
     Display(stop->entry);

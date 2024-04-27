@@ -14,6 +14,17 @@ struct Node
     }
 };
 
+struct ENode
+{
+    double value;
+    ENode *next;
+
+    ENode(double input)
+    {
+        value = input;
+    }
+};
+
 struct ExNode
 {
     char value;
@@ -80,6 +91,14 @@ void Push(Node **top, char c)
     *top = ptr;
 }
 
+void EPush(ENode **top, double c)
+{
+    ENode *ptr = new ENode(c);
+
+    ptr->next = *top;
+    *top = ptr;
+}
+
 void STPush(STNode **stop, ExNode *c)
 {
     STNode *ptr = new STNode(c);
@@ -97,6 +116,20 @@ void Pop(Node **top)
     else
     {
         Node *temp = *top;
+        *top = (*top)->next;
+        free(temp);
+    }
+}
+
+void EPop(ENode **top)
+{
+    if (*top == NULL)
+    {
+        cout << "Stack Underflow" << endl;
+    }
+    else
+    {
+        ENode *temp = *top;
         *top = (*top)->next;
         free(temp);
     }
@@ -174,14 +207,11 @@ string infixToPrefix(Node *top, string Infix)
                 Prefix += top->value;
                 Pop(&top);
             }
-            if (top)
-            {
-                Pop(&top);
-            }
+            Pop(&top);
         }
         else
         {
-            while (top && (getPrecedence(top->value) >= getPrecedence(Infix[i])))
+            while ((top != nullptr) && (getPrecedence(Infix[i]) < getPrecedence(top->value)) && (top->value != '('))
             {
                 Prefix += top->value;
                 Pop(&top);
@@ -200,7 +230,7 @@ string infixToPrefix(Node *top, string Infix)
     return Prefix;
 }
 
-int PrefixEvaluation(Node *top, string Prefix)
+int PrefixEvaluation(ENode *top, string Prefix)
 {
     reverse(Prefix.begin(), Prefix.end());
     for (int i = 0; i < Prefix.length(); i++)
@@ -210,21 +240,21 @@ int PrefixEvaluation(Node *top, string Prefix)
             cout << "Enter a value for " << Prefix[i] << " : ";
             double value;
             cin >> value;
-            Push(&top, value);
+            EPush(&top, value);
         }
         else if (Prefix[i] >= '0' && Prefix[i] <= '9')
         {
-            Push(&top, Prefix[i] - '0');
+            EPush(&top, Prefix[i] - '0');
         }
         else
         {
-            int op2 = top->value;
-            Pop(&top);
-            int op1 = top->value;
-            Pop(&top);
+            double op2 = top->value;
+            EPop(&top);
+            double op1 = top->value;
+            EPop(&top);
 
-            int result = ApplyOperator(Prefix[i], op1, op2);
-            Push(&top, result);
+            double result = ApplyOperator(Prefix[i], op1, op2);
+            EPush(&top, result);
         }
     }
     return top->value;
@@ -267,14 +297,14 @@ void CreateEvaluationTree(string Prefix, STNode **stop)
 int main()
 {
     Node *top = nullptr;
-    Node *etop = nullptr;
+    ENode *etop = nullptr;
     STNode *stop = nullptr;
-    string Infix = "(a-b/c)*(a/k-l)";
+    string Infix = "a+b*c/d*x-f*d";
 
     string Prefix = infixToPrefix(top, Infix);
     cout << "Prefix Expression: " << Prefix << endl;
 
-    int Evaluation = PrefixEvaluation(etop, Prefix);
+    double Evaluation = PrefixEvaluation(etop, Prefix);
     cout << "Prefix Evaluation: " << Evaluation << endl;
 
     CreateEvaluationTree(Prefix, &stop);

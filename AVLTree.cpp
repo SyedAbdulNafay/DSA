@@ -10,14 +10,14 @@ struct Node
     Node(int c)
     {
         value = c;
-        right = nullptr;
-        left = nullptr;
+        right = NULL;
+        left = NULL;
     }
 };
 
-int height(Node *root)
+void height(Node *root)
 {
-    if (root == nullptr)
+    if (root == NULL)
     {
         return -1;
     }
@@ -27,83 +27,90 @@ int height(Node *root)
     return lt > rt ? lt + 1 : rt + 1;
 }
 
-void Insert(Node **root)
+Node *RightRotate(Node *root)
 {
-    cout << "Enter value: ";
-    int value;
-    cin >> value;
+    Node *temp = root->left;
+    root->left = temp->right;
+    temp->right = root;
+    return temp;
+}
 
-    Node *node = new Node(value);
+Node *LeftRotate(Node *root)
+{
+    Node *temp = root->right;
+    root->right = temp->left;
+    temp->left = root;
+    return temp;
+}
 
-    if (*root == nullptr)
+Node *RInsert(Node *root, int value)
+{
+    if (root == NULL)
     {
-        *root = node;
-        return;
+        Node *node = new Node(value);
+        root = node;
+        return root;
     }
-    Node *curr = *root;
-
-    while (curr != nullptr)
+    if (root->value > value)
     {
-        if (curr->value < value)
+        root->left = RInsert(root->left, value);
+        if ((height(root->left) - height(root->right)) > 1 || (height(root->left) - height(root->right)) < -1)
         {
-            if (curr->right == nullptr)
+            if (value < root->left->value)
             {
-                curr->right = node;
-                return;
+                root = RightRotate(root);
             }
-
-            curr = curr->right;
+            else
+            {
+                root->left = LeftRotate(root->left);
+                root = RightRotate(root);
+            }
         }
-        else
+    }
+    else
+    {
+        root->right = RInsert(root->right, value);
+        if ((height(root->left) - height(root->right)) < -1)
         {
-            if (curr->left == nullptr)
+            // check if it needs single rotation or double rotation
+            if (value > root->right->value)
             {
-                curr->left = node;
-                return;
+                root = LeftRotate(root);
             }
-
-            curr = curr->left;
+            else
+            {
+                root->right = RightRotate(root->right);
+                root = LeftRotate(root);
+            }
         }
+        return root;
     }
 }
 
-void Search(Node *root)
+bool Search(Node *root, int toSearch)
 {
-    if (root == nullptr)
+    if (root == NULL)
     {
-        cout << "List is empty" << endl;
-        return;
+        return false;
+    }
+    if (root->value == toSearch)
+    {
+        return true;
     }
 
-    cout << "Enter value: ";
-    int toSearch;
-    cin >> toSearch;
-
-    Node *curr = root;
-
-    while (curr != nullptr)
+    if (toSearch > root->value)
     {
-        if (curr->value == toSearch)
-        {
-            cout << "Found" << endl;
-            return;
-        }
-        else if (curr->value < toSearch)
-        {
-            curr = curr->right;
-        }
-        else
-        {
-            curr = curr->left;
-        }
+        return Search(root->right, toSearch);
     }
-
-    cout << "Not found" << endl;
+    else
+    {
+        return Search(root->left, toSearch);
+    }
 }
 
 void Display(Node *root)
 {
-    if (root == nullptr)
+    if (root == NULL)
     {
         return;
     }
@@ -114,7 +121,7 @@ void Display(Node *root)
 
 int main()
 {
-    Node *root = nullptr;
+    Node *root = NULL;
     bool loop = true;
 
     while (loop)
@@ -132,10 +139,20 @@ int main()
         switch (option)
         {
         case 1:
-            Insert(&root);
+            cout << "Enter value: ";
+            int value;
+            cin >> value;
+            root = RInsert(root, value);
+            height(root);
             break;
         case 2:
-            Search(root);
+            cout << "Enter value: ";
+            int toSearch;
+            cin >> toSearch;
+
+            bool isFound;
+            isFound = Search(root, toSearch);
+            isFound ? cout << "Found" << endl : cout << "Not Found" << endl;
             break;
         case 3:
             Display(root);
