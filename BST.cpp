@@ -4,100 +4,58 @@ using namespace std;
 struct BSTNode
 {
     int data;
-    BSTNode * left;
-    BSTNode * right;
-
-    BSTNode()
-    {
-        data = 0;
-        left = nullptr;
-        right = nullptr;
-    }
+    BSTNode *left;
+    BSTNode *right;
 
     BSTNode(int d)
     {
         data = d;
-        left = nullptr;
-        right = nullptr;
+        left = NULL;
+        right = NULL;
     }
 };
 
-void Insert(BSTNode ** root)
+BSTNode *Insert(BSTNode *root, int value)
 {
-    cout << "Enter value: ";
-    int value;
-    cin >> value;
-
-    BSTNode * node = new BSTNode(value);
-
-    if (*root == nullptr)
+    if (root == NULL)
     {
-        *root = node;
-        return;
+        BSTNode *node = new BSTNode(value);
+        root = node;
+        return root;
     }
-    BSTNode * curr = *root;
-
-    while (curr != nullptr)
+    if (value > root->data)
     {
-        if (curr->data < value)
-        {
-            if (curr->right == nullptr)
-            {
-                curr->right = node;
-                return;
-            }
-
-            curr = curr->right;
-        }
-        else
-        {
-            if (curr->left == nullptr)
-            {
-                curr->left = node;
-                return;
-            }
-            
-            curr = curr->left;
-        }
+        root->right = Insert(root->right, value);
     }
-    
+    else
+    {
+        root->left = Insert(root->left, value);
+    }
+    return root;
 }
 
-void Search(BSTNode * root)
+void Search(BSTNode *root, int value)
 {
-    if (root == nullptr)
+    if (root == NULL)
     {
-        cout << "List is empty" << endl;
+        cout << "Not Found" << endl;
         return;
     }
-
-    cout << "Enter value: ";
-    int toSearch;
-    cin >> toSearch;
-
-    BSTNode * curr = root;
-
-    while (curr != nullptr)
+    if (root->data == value)
     {
-        if (curr->data == toSearch)
-        {
-            cout << "Found" << endl;
-            return;
-        }
-        else if (curr->data < toSearch)
-        {
-            curr = curr->right;
-        }
-        else
-        {
-            curr = curr->left;
-        }
+        cout << "Found" << endl;
     }
-
-    cout << "Not found" << endl;
+    else if (value > root->data)
+    {
+        Search(root->right, value);
+    }
+    else
+    {
+        Search(root->left, value);
+    }
 }
 
-void Display(BSTNode * root)
+void Display(BSTNode *root)
 {
     if (root == nullptr)
     {
@@ -110,7 +68,7 @@ void Display(BSTNode * root)
 
 int main()
 {
-    BSTNode * root = nullptr;
+    BSTNode *root = nullptr;
     bool loop = true;
 
     while (loop)
@@ -127,22 +85,29 @@ int main()
         switch (option)
         {
         case 1:
-            Insert(&root);
+            cout << "Enter value: ";
+            int value;
+            cin >> value;
+            root = Insert(root, value);
             break;
         case 2:
-            Search(root);
+            cout << "Enter value: ";
+            int toSearch;
+            cin >> toSearch;
+            Search(root, toSearch);
             break;
         case 3:
             Display(root);
+            cout << endl;
             break;
         case 0:
             loop = false;
             break;
-        
+
         default:
             break;
         }
     }
-    
+
     return 0;
 }

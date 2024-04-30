@@ -83,8 +83,8 @@ Node *RInsert(Node *root, int value)
                 root = LeftRotate(root);
             }
         }
-        return root;
     }
+    return root;
 }
 
 bool Search(Node *root, int toSearch)
