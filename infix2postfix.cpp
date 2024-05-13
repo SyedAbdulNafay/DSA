@@ -117,7 +117,7 @@ void Pop(Node **top)
     {
         Node *temp = *top;
         *top = (*top)->next;
-        free(temp);
+        delete temp;
     }
 }
 

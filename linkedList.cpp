@@ -61,7 +61,7 @@ Report *SortedInsert(Report *head, int roll, float gp, int count)
 bool Search(Report *head, int value)
 {
     if (head == NULL)
-        false;
+        return false;
     if (value == head->RollNo)
     {
         cout << "Found at index " << head->index << endl;

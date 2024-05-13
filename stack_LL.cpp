@@ -1,75 +1,87 @@
 #include <iostream>
 using namespace std;
-#include <cstdlib>
 
-struct Report
+struct Node
 {
-    int RollNo;
-    float GP;
-    Report * next;
+    int data;
+    Node *next;
+
+    Node(int d)
+    {
+        data = d;
+        next = nullptr;
+    }
 };
 
-
-void Push(Report ** top)
+Node *Push(Node *head, int value)
 {
-    Report * ptr = (Report *)malloc(sizeof(Report));
-
-    cout << "Enter Roll Number: ";
-    cin >> ptr->RollNo;
-    cout << "Enter GP: ";
-    cin >> ptr->GP;
-
-    ptr->next = *top;
-    *top = ptr;
-
-    cout << "Pushed :) " << endl;
+    Node *node = new Node(value);
+    if (head == nullptr)
+    {
+        return node;
+    }
+    node->next = head;
+    return node;
 }
 
-void Pop(Report ** top)
+void Pop(Node **head)
 {
-    if (*top == NULL)
+    if (*head == nullptr)
     {
         cout << "Stack Underflow" << endl;
+        return;
     }
-    else
-    {
-        Report * temp = *top;
-        *top = (*top)->next;
-        cout << temp->RollNo << " is Popped :) " << endl;
-        free(temp);
-    }
+    Node *temp = (*head)->next;
+    *head = (*head)->next;
+    delete *head;
+}
 
+void Print(Node *head)
+{
+    if (head == nullptr)
+        return;
+
+    cout << head->data << " ";
+    Print(head->next);
 }
 
 int main()
 {
-    Report * top = NULL;
-
-    bool flag = true;
-    while (flag == true)
+    Node *head = nullptr;
+    while (true)
     {
         cout << "Press" << endl;
-        cout << "1. To Push" << endl;
-        cout << "2. To Pop" << endl;
-        cout << "3. To Exit" << endl;
+        cout << "1. Push" << endl;
+        cout << "2. Pop" << endl;
+        cout << "3. Print" << endl;
+        cout << "0. Exit" << endl;
+
         int option;
         cin >> option;
-        
+
         if (option == 1)
         {
-            Push(&top);
+            int value;
+            cout << "Enter value: ";
+            cin >> value;
+            head = Push(head, value);
         }
         else if (option == 2)
         {
-            Pop(&top);
+            Pop(&head);
         }
         else if (option == 3)
         {
-            flag = false;
+            Print(head);
+            cout << endl;
+        }
+        else if (option == 0)
+        {
+            break;
         }
         else
         {
-            cout << "Enter valid option. " << endl;
+            cout << "Enter valid option" << endl;
         }
     }
 

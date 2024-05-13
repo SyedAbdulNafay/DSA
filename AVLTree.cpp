@@ -15,7 +15,7 @@ struct Node
     }
 };
 
-void height(Node *root)
+int height(Node *root)
 {
     if (root == NULL)
     {
@@ -143,7 +143,6 @@ int main()
             int value;
             cin >> value;
             root = RInsert(root, value);
-            height(root);
             break;
         case 2:
             cout << "Enter value: ";

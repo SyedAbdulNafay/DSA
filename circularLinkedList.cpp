@@ -7,53 +7,68 @@ struct Report
 {
     int RollNo;
     float GP;
-    Report * next;
+    Report *next;
     int index;
+
+    Report(int r, float g, int i)
+    {
+        RollNo = r;
+        GP = g;
+        index = i;
+        next = NULL;
+    }
 };
 
-void Insert(Report **head, int * nodeCount)
+void Insert(Report **head, int roll, float gp, int count)
 {
-    Report * ptr = (Report *)malloc(sizeof(Report));
-    cout << "Enter your roll number: ";
-    cin >> ptr->RollNo;
-    cout << "Enter your GP: ";
-    cin >> ptr->GP;
-
-    ptr->next = NULL;
-    ptr->index = *nodeCount;
-
+    Report *node = new Report(roll, gp, count);
     if (*head == NULL)
     {
-        *head = ptr;
-        ptr->next = *head;
-    } 
-    else
-    {
-        Report * curr = *head;
-
-        while (curr->next != *head)
-        {
-            curr = curr->next;
-        }
-        curr->next = ptr;
-        ptr->next = *head;
+        node->next = node;
+        *head = node;
+        return;
     }
-    (*nodeCount)++;
+    Report *temp = *head;
+    while (temp->next != *head)
+    {
+        temp = temp->next;
+    }
+    temp->next = node;
+    node->next = *head;
 }
 
-void Search(Report * head, int * nodeCount)
+Report *RInsert(Report *head, Report *curr, int roll, float gp, int count)
+{
+    if (head == NULL)
+    {
+        Report *node = new Report(roll, gp, count);
+        node->next = node;
+        return node;
+    }
+    if (head->next == curr)
+    {
+        Report *node = new Report(roll, gp, count);
+        node->next = curr;
+        head->next = node;
+        return head;
+    }
+    head->next = RInsert(head->next, curr, roll, gp, count);
+    return head;
+}
+
+void Search(Report *head, int *nodeCount)
 {
     if ((*nodeCount) == 0)
     {
         cout << "List is empty" << endl;
     }
-    else 
+    else
     {
         int input;
         cout << "Enter the roll number you want to search: ";
         cin >> input;
 
-        Report * curr = head;
+        Report *curr = head;
         bool flag = false;
 
         do
@@ -66,7 +81,7 @@ void Search(Report * head, int * nodeCount)
             }
             curr = curr->next;
         } while (curr->next != head);
-        
+
         if (!flag)
         {
             cout << "Not found :(" << endl;
@@ -74,55 +89,62 @@ void Search(Report * head, int * nodeCount)
     }
 }
 
-void Delete(Report **head, int * nodeCount)
+void Indexing(Report **head, int i)
 {
-    if ((*nodeCount) == 0)
+    (*head)->index = i;
+    if ((*head)->next == *head)
     {
-        cout << "List is empty" << endl;
+        return;
     }
-    else
-    {
-        // Report * curr = *head;
-
-        int toDel;
-        cout << "Enter the roll number you want to delete: ";
-        cin >> toDel;
-
-
-        if ((*head)->RollNo == toDel)
-        {
-            Report * curr = *head;
-            *head = (*head)->next;
-            free(curr);
-        }
-        else
-        {
-            Report * prev = *head;
-            Report * curr = (*head)->next;
-            while (curr != *head)
-            {
-                if (curr->RollNo == toDel)
-                {
-                    prev->next = curr->next;
-                    free(curr);
-                    Report * temp = prev->next;
-                    while (temp != *head)
-                    {
-                        temp->index--;
-                        temp = temp->next;
-                    }
-                    return;
-                }
-                curr = curr->next;
-                prev = prev->next;
-            }
-            cout << "Not found in list" << endl;
-        }
-        (*nodeCount)--;
-    }
+    Indexing(&((*head)->next), i + 1);
 }
 
-void DeleteAll(Report **head, int * nodeCount)
+void Delete(Report **head, int value)
+{
+    if (*head == NULL)
+    {
+        cout << "List is empty" << endl;
+        return;
+    }
+
+    if ((*head)->RollNo == value)
+    {
+        Report *temp = *head;
+        if ((*head)->next == *head)
+        {
+            Report *toDelete = *head;
+            *head = NULL;
+            delete toDelete;
+            return;
+        }
+        while (temp->next != *head)
+        {
+            temp = temp->next;
+        }
+        Report *toDelete = *head;
+        temp->next = (*head)->next;
+        *head = (*head)->next;
+        delete toDelete;
+        return;
+    }
+    Report *temp = (*head)->next;
+
+    while (temp != *head)
+    {
+        if (temp->next->RollNo == value)
+        {
+            Report *toDelete = temp->next;
+            temp->next = temp->next->next;
+            delete toDelete;
+            return;
+        }
+
+        temp = temp->next;
+    }
+    cout << "Not found" << endl;
+}
+
+void DeleteAll(Report **head, int *nodeCount)
 {
     if ((*nodeCount) == 0)
     {
@@ -130,8 +152,8 @@ void DeleteAll(Report **head, int * nodeCount)
     }
     else
     {
-        Report * curr = *head;
-        Report * temp;
+        Report *curr = *head;
+        Report *temp;
 
         do
         {
@@ -140,84 +162,40 @@ void DeleteAll(Report **head, int * nodeCount)
             free(temp);
             (*nodeCount)--;
         } while (curr != *head);
-        
+
         *head = NULL;
         cout << "List is deleted" << endl;
     }
 }
 
-void Print(Report * head, int * nodeCount)
+void Print(Report *head, int *nodeCount)
 {
     if (head == NULL)
     {
-        cout << "The list is empty" << endl;
+        cout << "List is empty" << endl;
+        return;
     }
-    else
+    Report *temp = head;
+    do
     {
-        Report * curr = head;
-
-        do
-        {
-            cout << curr->index << ". " "Roll No: " << curr->RollNo << ", GP: " << curr->GP << endl;
-            curr = curr->next;
-        } while (curr != head);
-    }
+        cout << "Roll Number: " << temp->RollNo << ", GP: " << temp->GP << endl;
+        temp = temp->next;
+    } while (temp != head);
+    cout << endl;
 }
 
-void itemCount(int * nodeCount)
+void itemCount(int *nodeCount)
 {
     cout << "Number of items in the list are: " << (*nodeCount) << endl;
 }
 
 int main()
 {
-    Report * head = NULL;
-    int (nodeCount) = 0;
+    Report *head = NULL;
+    int nodeCount = 0;
+    bool loop = true;
 
-    cout << "Which operation do you want to proceed with? " << endl;
-    cout << "1. Insert" << endl;
-    cout << "2. Search" << endl;
-    cout << "3. Print" << endl;
-    cout << "4. Delete" << endl;
-    cout << "5. Delete All" << endl;
-    cout << "6. Number of items" << endl;
-
-    int option;
-    cin >> option;
-
-    if (option == 1)
-    {
-        Insert(&head, &nodeCount);
-    }
-    else if (option == 2)
-    {
-        Search(head, &nodeCount);
-    }
-    else if (option == 3)
-    {
-        Print(head, &nodeCount);
-    } else if (option == 4)
-    {
-        Delete(&head, &nodeCount);
-    }
-    else if (option == 5)
-    {
-        DeleteAll(&head, &nodeCount);
-    }
-    else if (option == 6)
-    {
-        itemCount(&nodeCount);
-    }
-    else 
-    {
-        cout << "Enter valid input" << endl;
-    }
-
-    cout << "Do you want to continue? y/n: " << endl;
-    string answer;
-    cin >> answer;
-
-    while (answer == "y")
+    while (loop)
     {
         cout << "Which operation do you want to proceed with? " << endl;
         cout << "1. Insert" << endl;
@@ -226,13 +204,26 @@ int main()
         cout << "4. Delete" << endl;
         cout << "5. Delete All" << endl;
         cout << "6. Number of items" << endl;
+        cout << "0. Exit" << endl;
 
         int option;
         cin >> option;
-
-        if (option == 1)
+        if (option == 0)
         {
-            Insert(&head, &nodeCount);
+            loop = false;
+        }
+        else if (option == 1)
+        {
+            cout << "Roll Number: ";
+            int roll;
+            cin >> roll;
+            cout << "GP: ";
+            int gp;
+            cin >> gp;
+            Insert(&head, roll, gp, nodeCount);
+
+            // head = Insert(head, head, roll, gp, nodeCount);
+            // nodeCount++;
         }
         else if (option == 2)
         {
@@ -241,9 +232,15 @@ int main()
         else if (option == 3)
         {
             Print(head, &nodeCount);
-        } else if (option == 4)
+        }
+        else if (option == 4)
         {
-            Delete(&head, &nodeCount);
+            cout << "Roll Number: ";
+            int roll;
+            cin >> roll;
+            Delete(&head, roll);
+            cout << "Deleted" << endl;
+            nodeCount--;
         }
         else if (option == 5)
         {
@@ -253,15 +250,81 @@ int main()
         {
             itemCount(&nodeCount);
         }
-        else 
+        else
         {
             cout << "Enter valid input" << endl;
         }
-
-        cout << "Do you want to continue? y/n: " << endl;
-        cin >> answer;
-        
     }
+
+    // cout << "Do you want to continue? y/n: " << endl;
+    // string answer;
+    // cin >> answer;
+
+    // while (answer == "y")
+    // {
+    //     cout << "Which operation do you want to proceed with? " << endl;
+    //     cout << "1. Insert" << endl;
+    //     cout << "2. Search" << endl;
+    //     cout << "3. Print" << endl;
+    //     cout << "4. Delete" << endl;
+    //     cout << "5. Delete All" << endl;
+    //     cout << "6. Number of items" << endl;
+
+    //     int option;
+    //     cin >> option;
+
+    //     if (option == 1)
+    //     {
+    //         cout << "Roll Number: ";
+    //         int roll;
+    //         cin >> roll;
+    //         cout << "GP: ";
+    //         int gp;
+    //         cin >> gp;
+    //         Insert(&head, roll, gp, nodeCount);
+    //         // cout << "Roll Number: ";
+    //         // int roll;
+    //         // cin >> roll;
+    //         // cout << "GP: ";
+    //         // int gp;
+    //         // cin >> gp;
+
+    //         // head = Insert(head, head, roll, gp, nodeCount);
+    //         // nodeCount++;
+    //     }
+    //     else if (option == 2)
+    //     {
+    //         Search(head, &nodeCount);
+    //     }
+    //     else if (option == 3)
+    //     {
+    //         Print(head, &nodeCount);
+    //     }
+    //     else if (option == 4)
+    //     {
+    //         cout << "Roll Number: ";
+    //         int roll;
+    //         cin >> roll;
+    //         Delete(&head, roll);
+    //         Indexing(&head, 0);
+    //         nodeCount--;
+    //     }
+    //     else if (option == 5)
+    //     {
+    //         DeleteAll(&head, &nodeCount);
+    //     }
+    //     else if (option == 6)
+    //     {
+    //         itemCount(&nodeCount);
+    //     }
+    //     else
+    //     {
+    //         cout << "Enter valid input" << endl;
+    //     }
+
+    //     cout << "Do you want to continue? y/n: " << endl;
+    //     cin >> answer;
+    // }
 
     return 0;
 }

@@ -1,82 +1,100 @@
 #include <iostream>
 using namespace std;
-#include <cstdlib>
 
-struct Report
+struct Node
 {
-    int RollNo;
-    float GP;
-    Report * next;
+    int data;
+    Node *next;
+
+    Node(int v)
+    {
+        data = v;
+        next = nullptr;
+    }
 };
 
-void EnQueue(Report ** front, Report ** rear)
+void Enqueue(Node **front, Node **rear, int value)
 {
-    Report * ptr = (Report *)malloc(sizeof(Report));
-
-    cout << "Enter Roll Number: ";
-    cin >> ptr->RollNo;
-    cout << "Enter GP: ";
-    cin >> ptr->GP;
-
-    ptr->next = NULL;
-
-    if (*front == NULL)
+    Node *node = new Node(value);
+    if (*front == nullptr)
     {
-        *front = ptr;
-        *rear = ptr;
+        *front = node;
+        *rear = node;
+        return;
     }
-    else
-    {
-        (*rear)->next = ptr;
-        *rear = (*rear)->next;
-    }
+    (*front)->next = node;
+    *front = node;
 }
 
-void DeQueue(Report ** front)
+void Dequeue(Node **rear, Node **front)
 {
-    if (*front == NULL)
+    if (*rear == nullptr)
     {
-        cout << "Stack Underflow" << endl;
+        cout << "Stack Undeflow" << endl;
+        return;
+    }
+    Node *temp = *rear;
+    if ((*rear)->next == nullptr)
+    {
+        *rear = nullptr;
+        *front = nullptr;
     }
     else
     {
-        Report * temp = *front;
-        *front = (*front)->next;
-        cout << temp->RollNo << " is DeQueued. " << endl;
-        free(temp);
+        *rear = (*rear)->next;
     }
+    delete temp;
+}
+
+void Print(Node *rear)
+{
+    Node *curr = rear;
+    while (curr != nullptr)
+    {
+        cout << curr->data << " ";
+        curr = curr->next;
+    }
+    cout << endl;
 }
 
 int main()
 {
-    Report * front = NULL;
-    Report * rear = NULL;
+    Node *front = nullptr;
+    Node *rear = nullptr;
 
-    bool flag = true;
-    while (flag == true)
+    while (true)
     {
         cout << "Press" << endl;
-        cout << "1. To EnQueue" << endl;
-        cout << "2. To DeQueue" << endl;
-        cout << "3. To Exit" << endl;
+        cout << "1. Enqueue" << endl;
+        cout << "2. Dequeue" << endl;
+        cout << "3. Print" << endl;
+        cout << "0. Exit" << endl;
+
         int option;
         cin >> option;
-        
+
         if (option == 1)
         {
-            EnQueue(&front, &rear);
+            int value;
+            cout << "Enter value: ";
+            cin >> value;
+            Enqueue(&front, &rear, value);
         }
         else if (option == 2)
         {
-            DeQueue(&front);
+            Dequeue(&rear, &front);
         }
         else if (option == 3)
         {
-            flag = false;
+            Print(rear);
+        }
+        else if (option == 0)
+        {
+            break;
         }
         else
         {
-            cout << "Enter valid option. " << endl;
+            cout << "Enter valid option" << endl;
         }
     }
 

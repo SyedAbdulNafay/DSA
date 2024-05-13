@@ -1,13 +1,13 @@
 #include <iostream>
 using namespace std;
 
-struct BSTNode
+struct Node
 {
     int data;
-    BSTNode *left;
-    BSTNode *right;
+    Node *left;
+    Node *right;
 
-    BSTNode(int d)
+    Node(int d)
     {
         data = d;
         left = NULL;
@@ -15,11 +15,11 @@ struct BSTNode
     }
 };
 
-BSTNode *Insert(BSTNode *root, int value)
+Node *Insert(Node *root, int value)
 {
     if (root == NULL)
     {
-        BSTNode *node = new BSTNode(value);
+        Node *node = new Node(value);
         root = node;
         return root;
     }
@@ -34,7 +34,7 @@ BSTNode *Insert(BSTNode *root, int value)
     return root;
 }
 
-void Search(BSTNode *root, int value)
+void Search(Node *root, int value)
 {
     if (root == NULL)
     {
@@ -55,57 +55,141 @@ void Search(BSTNode *root, int value)
     }
 }
 
-void Display(BSTNode *root)
+void InOrderTraversal(Node *head)
 {
-    if (root == nullptr)
-    {
+    if (head == nullptr)
         return;
+    InOrderTraversal(head->left);
+    cout << head->data << " ";
+    InOrderTraversal(head->right);
+}
+
+void PreOrderTraversal(Node *head)
+{
+    if (head == nullptr)
+        return;
+    cout << head->data << " ";
+    PreOrderTraversal(head->left);
+    PreOrderTraversal(head->right);
+}
+
+void PostOrderTraversal(Node *head)
+{
+    if (head == nullptr)
+        return;
+    PostOrderTraversal(head->left);
+    PostOrderTraversal(head->right);
+    cout << head->data << " ";
+}
+
+Node *FindMin(Node* head){
+    while (head->left != nullptr) head = head->left;
+    return head;
+}
+
+Node *Delete(Node *head, int value)
+{
+    if (head == nullptr)
+        return;
+
+    if (value > head->data)
+        head->right = Delete(head->right, value);
+    else if (value < head->data)
+        head->left = Delete(head->left, value);
+    else
+    {
+        // 0 children
+        if (head->right == nullptr && head->left == nullptr)
+        {
+            delete head;
+            head = nullptr;
+        }
+        // 1 right child
+        else if (head->left == nullptr)
+        {
+            Node *temp = head;
+            head = head->right;
+            delete temp;
+        }
+        // 1 left child
+        else if (head->right == nullptr)
+        {
+            Node *temp = head;
+            head = head->left;
+            delete temp;
+        }
+        // 2 children
+        else {
+            Node *temp = FindMin(head->right);
+            head->data = temp->data;
+            head->right = Delete(head->right, temp->data);
+        }
     }
-    Display(root->left);
-    cout << root->data << " ";
-    Display(root->right);
+    return head;
 }
 
 int main()
 {
-    BSTNode *root = nullptr;
-    bool loop = true;
+    Node *head = nullptr;
 
-    while (loop)
+    while (true)
     {
         cout << "Press" << endl;
         cout << "1. Insert" << endl;
         cout << "2. Search" << endl;
-        cout << "3. Display" << endl;
+        cout << "3. Delete" << endl;
+        cout << "4. In Order Traversal" << endl;
+        cout << "5. Pre Order Traversal" << endl;
+        cout << "6. Post Order Traversal" << endl;
         cout << "0. Exit" << endl;
 
         int option;
         cin >> option;
 
-        switch (option)
+        if (option == 1)
         {
-        case 1:
-            cout << "Enter value: ";
             int value;
-            cin >> value;
-            root = Insert(root, value);
-            break;
-        case 2:
             cout << "Enter value: ";
-            int toSearch;
-            cin >> toSearch;
-            Search(root, toSearch);
+            cin >> value;
+            head = Insert(head, value);
+        }
+        else if (option == 2)
+        {
+            int value;
+            cout << "Enter value: ";
+            cin >> value;
+            bool check = Search(head, value);
+            if (!check)
+            {
+                cout << "Not found" << endl;
+            }
+        }
+        else if (option == 3)
+        {
+            int value;
+            cout << "Enter value: ";
+            cin >> value;
+            head = Delete(head, value);
+        }
+        else if (option == 4)
+        {
+            InOrderTraversal(head);
+        }
+        else if (option == 5)
+        {
+            PreOrderTraversal(head);
+        }
+        else if (option == 6)
+        {
+            PostOrderTraversal(head);
+        }
+        else if (option == 0)
+        {
             break;
-        case 3:
-            Display(root);
-            cout << endl;
-            break;
-        case 0:
-            loop = false;
-            break;
-
-        default:
-            break;
+        }
+        else
+        {
+            cout << "Enter valid option" << endl;
         }
     }
 
