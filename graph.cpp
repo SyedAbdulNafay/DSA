@@ -1,5 +1,7 @@
 #include <iostream>
 #include <unordered_map>
+#include <vector>
+#include <algorithm>
 #include <list>
 #include <queue>
 using namespace std;
@@ -19,8 +21,10 @@ public:
         }
     }
 
-    void bfs(unordered_map<int, list<int>> &adj, unordered_map<int, bool> &visited, vector<int> &ans, int node)
+    void bfs(int node)
     {
+        unordered_map<int, bool> visited;
+        vector<int> ans;
         queue<int> q;
         q.push(node);
         visited[node] = true;
@@ -39,19 +43,6 @@ public:
                     q.push(i);
                     visited[i] = true;
                 }
-            }
-        }
-    }
-
-    void BFS(int vertex)
-    {
-        unordered_map<int, bool> visited;
-        vector<int> ans;
-        for (int i = 0; i < vertex; i++)
-        {
-            if (!visited[i])
-            {
-                bfs(adj, visited, ans, i);
             }
         }
         for (int i = 0; i < ans.size(); i++)
@@ -155,9 +146,9 @@ public:
         while (!q.empty())
         {
             int front = q.front();
-            q.pop()
+            q.pop();
 
-                for (auto i : adj[front])
+            for (auto i : adj[front])
             {
                 if (!visited[i])
                 {
@@ -170,7 +161,7 @@ public:
 
         vector<int> ans;
         int currentNode = end;
-        ans.push_back(t);
+        ans.push_back(end);
 
         while (currentNode != start)
         {
@@ -223,10 +214,13 @@ int main()
 
     g.print();
 
-    // g.BFS(n);
+    g.bfs(0);
 
-    // g.DFS(n);
-    g.CecleDet(n);
+    g.DFS(n);
+    string check = g.CycleDet(n);
+    cout << check << endl;
+
+    g.shortestPath(0, 4);
 
     return 0;
 }
