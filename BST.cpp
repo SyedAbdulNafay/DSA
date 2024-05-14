@@ -128,6 +128,19 @@ Node *Delete(Node *head, int value)
     return head;
 }
 
+Node *Mirror(Node *head)
+{
+    if (head == nullptr) return head;
+
+    Node *rc = Mirror(head->right);
+    Node *lc = Mirror(head->left);
+
+    head->left = rc;
+    head->right = lc;
+
+    return head;
+}
+
 int main()
 {
     Node *head = nullptr;
@@ -141,6 +154,7 @@ int main()
         cout << "4. In Order Traversal" << endl;
         cout << "5. Pre Order Traversal" << endl;
         cout << "6. Post Order Traversal" << endl;
+        cout << "7. Mirror" << endl;
         cout << "0. Exit" << endl;
 
         int option;
@@ -178,6 +192,10 @@ int main()
         else if (option == 6)
         {
             PostOrderTraversal(head);
+        }
+        else if (option == 7)
+        {
+            head = Mirror(head);
         }
         else if (option == 0)
         {

@@ -299,7 +299,7 @@ int main()
     Node *top = nullptr;
     ENode *etop = nullptr;
     STNode *stop = nullptr;
-    string Infix = "a+b*c/d*x-f*d";
+    string Infix = "a+b-c";
 
     string Prefix = infixToPrefix(top, Infix);
     cout << "Prefix Expression: " << Prefix << endl;
