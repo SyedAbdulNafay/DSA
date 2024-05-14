@@ -90,7 +90,7 @@ Node *FindMin(Node* head){
 Node *Delete(Node *head, int value)
 {
     if (head == nullptr)
-        return;
+        return head;
 
     if (value > head->data)
         head->right = Delete(head->right, value);
@@ -158,11 +158,7 @@ int main()
             int value;
             cout << "Enter value: ";
             cin >> value;
-            bool check = Search(head, value);
-            if (!check)
-            {
-                cout << "Not found" << endl;
-            }
+            Search(head, value);
         }
         else if (option == 3)
         {
