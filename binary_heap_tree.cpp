@@ -99,6 +99,22 @@ bool Family(HeapNode *head, string value, bool check)
     return check;
 }
 
+int LevelOfNode(HeapNode *head, string value, int level)
+{
+    if (head == nullptr)
+        return -1;
+
+    if (head->data == value)
+        return level;
+
+    int l = LevelOfNode(head->left, value, level + 1);
+
+    if (l != -1)
+        return l;
+
+    return LevelOfNode(head->right, value, level + 1);
+}
+
 int main()
 {
     HeapNode *head = nullptr;
@@ -110,6 +126,7 @@ int main()
         cout << "2. Print binary heap" << endl;
         cout << "3. Mirror" << endl;
         cout << "4. Find Predecessors and successors" << endl;
+        cout << "5. Level of node" << endl;
         cout << "0. Exit" << endl;
 
         int opt;
@@ -138,6 +155,23 @@ int main()
             cout << "Enter value: ";
             cin >> value;
             Family(head, value, false);
+        }
+        else if (opt == 5)
+        {
+            string value;
+            cout << "Enter string: ";
+            cin >> value;
+
+            int i = LevelOfNode(head, value, 0);
+
+            if (i != -1)
+            {
+                cout << "Level: " << i << endl;
+            }
+            else
+            {
+                cout << "Not found" << endl;
+            }
         }
         else if (opt == 0)
         {
