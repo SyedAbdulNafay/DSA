@@ -82,8 +82,10 @@ void PostOrderTraversal(Node *head)
     cout << head->data << " ";
 }
 
-Node *FindMin(Node* head){
-    while (head->left != nullptr) head = head->left;
+Node *FindMin(Node *head)
+{
+    while (head->left != nullptr)
+        head = head->left;
     return head;
 }
 
@@ -119,7 +121,8 @@ Node *Delete(Node *head, int value)
             delete temp;
         }
         // 2 children
-        else {
+        else
+        {
             Node *temp = FindMin(head->right);
             head->data = temp->data;
             head->right = Delete(head->right, temp->data);
@@ -130,7 +133,8 @@ Node *Delete(Node *head, int value)
 
 Node *Mirror(Node *head)
 {
-    if (head == nullptr) return head;
+    if (head == nullptr)
+        return head;
 
     Node *rc = Mirror(head->right);
     Node *lc = Mirror(head->left);
@@ -139,6 +143,15 @@ Node *Mirror(Node *head)
     head->right = lc;
 
     return head;
+}
+
+bool isSameTree(Node *tree1, Node *tree2)
+{
+    if (tree1 == nullptr && tree2 == nullptr)
+        return true;
+    if (tree1 == nullptr || tree2 == nullptr || tree1->data != tree2->data)
+        return false;
+    return (isSameTree(tree1->left, tree2->left) || isSameTree(tree1->right, tree2->right));
 }
 
 int main()

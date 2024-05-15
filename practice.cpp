@@ -1,7 +1,8 @@
 #include <iostream>
 using namespace std;
+#include <queue>
 
-void Print(int arr[100], int size)
+void PrintArr(int arr[100], int size)
 {
     for (int i = 0; i < size; i++)
     {
@@ -68,13 +69,40 @@ int main()
     int arr[100];
     int size = 0;
 
-    Insert(arr, 50, &size);
-    Insert(arr, 55, &size);
-    Insert(arr, 53, &size);
-    Insert(arr, 52, &size);
-    Insert(arr, 54, &size);
-    Print(arr, size);
-    DeleteFromHeap(arr, &size);
-    Print(arr, size);
+    while (true)
+    {
+        cout << "Press" << endl;
+        cout << "1. Insert into array" << endl;
+        cout << "2. Delete from array" << endl;
+        cout << "3. Print array" << endl;
+        cout << "0. Exit" << endl;
+
+        int opt;
+        cin >> opt;
+
+        if (opt == 1)
+        {
+            int value;
+            cout << "Enter value: ";
+            cin >> value;
+            Insert(arr, value, &size);
+        }
+        else if (opt == 2)
+        {
+            DeleteFromHeap(arr, &size);
+        }
+        else if (opt == 3)
+        {
+            PrintArr(arr, size);
+        }
+        else if (opt == 0)
+        {
+            break;
+        }
+        else
+        {
+            cout << "Enter valid option" << endl;
+        }
+    }
     return 0;
 }
